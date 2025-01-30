@@ -19,3 +19,14 @@ app.get("/webhook", (req, res) => {
     res.sendStatus(403);
   }
 });
+
+// Obrada poruka od Facebooka
+app.post("/webhook", (req, res) => {
+  let body = req.body;
+
+  console.log("Primljena poruka:", JSON.stringify(body, null, 2));
+
+  res.sendStatus(200);
+});
+
+app.listen(3000, () => console.log("Server radi na portu 3000"));
