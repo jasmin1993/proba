@@ -1,8 +1,7 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());  // Umesto body-parser.json(), koristi express.json()
 
 const VERIFY_TOKEN = "my_custom_token"; // Ovo mora biti isto kao u Meta Developer Console
 
@@ -27,4 +26,6 @@ app.post("/webhook", (req, res) => {
   res.sendStatus(200);
 });
 
-app.listen(3000, () => console.log("Server pokrenut na portu 3000"));
+// Dinamičko dodeljivanje porta (Render okruženje)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server pokrenut 
