@@ -1,31 +1,41 @@
-const express = require("express");
-
+const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
-app.use(express.json());  // Umesto body-parser.json(), koristi express.json()
 
-const VERIFY_TOKEN = "my_custom_token"; // Ovo mora biti isto kao u Meta Developer Console
+app.use(bodyParser.json());
 
-// Verifikacija webhooka
-app.get("/webhook", (req, res) => {
-  let mode = req.query["hub.mode"];
-  let token = req.query["hub.verify_token"];
-  let challenge = req.query["hub.challenge"];
+// Webhook endpoint za verifikaciju
+app.get('/webhook', (req, res) => {
+    const VERIFY_TOKEN = 'your_verify_token'; // Zamijenite sa vašim tokenom
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
 
-  if (mode === "subscribe" && token === VERIFY_TOKEN) {
-    console.log("WEBHOOK_VERIFIED");
-    res.status(200).send(challenge);
-  } else {
-    res.sendStatus(403);
-  }
+    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+        console.log('WEBHOOK_VERIFIED');
+        res.status(200).send(challenge);
+    } else {
+        res.sendStatus(403);
+    }
 });
 
-// Obrada primljenih poruka
-app.post("/webhook", (req, res) => {
-  let body = req.body;
-  console.log("Primljena poruka:", JSON.stringify(body, null, 2));
-  res.sendStatus(200);
+// Webhook endpoint za primanje poruka
+app.post('/webhook', (req, res) => {
+    const body = req.body;
+
+    if (body.object === 'page') {
+        body.entry.forEach(entry => {
+            const webhookEvent = entry.messaging[0];
+            console.log('Webhook event received:', webhookEvent);
+            // Ovdje dodajte logiku za obradu poruka
+        });
+        res.status(200).send('EVENT_RECEIVED');
+    } else {
+        res.sendStatus(404);
+    }
 });
 
-// Dinamičko dodeljivanje porta (Render okruženje)
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server pokrenut 
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
